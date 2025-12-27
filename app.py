@@ -4,11 +4,10 @@ from flask import Flask, render_template, request
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# --- CONFIGURATION ---
 load_dotenv()
 app = Flask(__name__)
 
-# FIX: We pass the headers here, once, when setting up the client.
+
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY"),
@@ -18,8 +17,8 @@ client = OpenAI(
     }
 )
 
-# --- THE COUNCIL MEMBERS ---
-# --- THE COUNCIL MEMBERS ---
+
+# THE COUNCIL MEMBERS 
 COUNCIL = [
     {
         "id": "meta-llama/llama-3.3-70b-instruct:free",
@@ -56,7 +55,7 @@ COUNCIL = [
     }
 ]
 
-# --- HELPER FUNCTION ---
+# HELPER FUNCTION 
 def talk_to_ai(model_id, system_instruction, user_message):
     try:
         # FIX: Removed 'headers=' from here. It is now handled automatically.
@@ -72,7 +71,7 @@ def talk_to_ai(model_id, system_instruction, user_message):
         print(f"Error with {model_id}: {e}")
         return f"Model Error: {str(e)}"
 
-# --- MAIN ROUTE ---
+# MAIN ROUTE
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -98,7 +97,7 @@ def home():
                     "text": future.result()
                 })
 
-            # === PHASE 2: PEER REVIEW ===
+            # PHASE 2: PEER REVIEW 
             transcript = "Here are the proposed answers from your colleagues:\n\n"
             for i, draft in enumerate(drafts):
                 transcript += f"--- Candidate {i+1} ({draft['name']}) ---\n{draft['text']}\n\n"
@@ -118,7 +117,7 @@ def home():
                     "text": future.result()
                 })
 
-        # === PHASE 3: THE VERDICT ===
+        # PHASE 3: THE VERDICT 
         final_dossier = f"User Question: {user_query}\n\n=== DRAFTS ===\n{transcript}\n\n=== CRITIQUES ===\n"
         for c in critiques:
             final_dossier += f"{c['name']} says: {c['text']}\n"
